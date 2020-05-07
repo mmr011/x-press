@@ -1,7 +1,7 @@
 const express = require('express');
 const artistApi = express.Router();
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database(process.env.TEST_DATABASE || '../database.sqlite');
+const db = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite');
 
 artistApi.param('artistId', (req, res, next, artistId) => {
     db.get(
@@ -95,19 +95,44 @@ artistApi.put('/:artistId', (req, res, next) => {
             $dateOfBirth: dateOfBirth,
             $biography: biography,
             $isCurrentlyEmployed: isCurrentlyEmployed, 
-            $artisId: req.params.artistId
+            $artistId: req.params.artistId
         }, 
         (err) => {
             if(err) {
                 next(err);
             } else {
                 db.get(
-                    `SELECT * FROM Artist WHERE id = ${artistId}`, 
+                    `SELECT * FROM Artist WHERE id = ${req.params.artistId}`, 
                     (err, updatedArtist) => {
                         if(err) {
                             next(err);
                         } else {
-                            res.json(200).json({ artist: updatedArtist });
+                            res.status(200).json({ artist: updatedArtist });
+                        };
+                    }
+                );
+            };
+        }
+    );
+});
+
+artistApi.delete('/:artistId', (req, res, next) => {
+    db.run(
+        'UPDATE Artist SET is_currently_employed = 0 WHERE Artist.id = $artistId',
+        {
+            $artistId: req.params.artistId
+        }, 
+        (err) => {
+            if(err) {
+                next(err);
+            } else {
+                db.get(
+                    `SELECT * FROM Artist WHERE id = ${req.params.artistId}`, 
+                    (err, unemployedArtist) => {
+                        if(err) {
+                            next(err);
+                        } else {
+                            res.status(200).json({ artist: unemployedArtist });
                         };
                     }
                 );

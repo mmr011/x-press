@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database('database.sqlite');
+const db = new sqlite3.Database('./database.sqlite');
 
 db.run(
     'DROP TABLE IF EXISTS Artist', 
@@ -23,4 +23,25 @@ db.run(
             );
         };
     }
+);
+
+db.run(
+    'DROP TABLE IF EXISTS Series',
+    (err) => {
+        if(err) {
+            throw err; 
+        } else {
+            db.run(
+                '`id` INTEGER NOT NULL, ' +
+                '`name` TEXT NOT NULL, ' + 
+                '`description` TEXT NOT NULL, ' +
+                'PRIMARY KEY(`id`) )', 
+                (err) => {
+                    if(err) {
+                        throw err; 
+                    };
+                }
+            );
+        };
+    } 
 );
