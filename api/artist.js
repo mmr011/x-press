@@ -1,9 +1,9 @@
 const express = require('express');
-const artistApi = express.Router();
+const artistRouter = express.Router();
 const sqlite3 = require('sqlite3');
 const db = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite');
 
-artistApi.param('artistId', (req, res, next, artistId) => {
+artistRouter.param('artistId', (req, res, next, artistId) => {
     db.get(
         'SELECT * FROM Artist WHERE id = $id', 
         {
@@ -22,7 +22,7 @@ artistApi.param('artistId', (req, res, next, artistId) => {
     );
 });
 
-artistApi.get('/', (req, res, next) => {
+artistRouter.get('/', (req, res, next) => {
     db.all(
         'SELECT * FROM Artist WHERE is_currently_employed = 1', 
         (err, artists) => {
@@ -35,11 +35,11 @@ artistApi.get('/', (req, res, next) => {
     );
 });
 
-artistApi.get('/:artistId', (req, res, next) => {
+artistRouter.get('/:artistId', (req, res, next) => {
     res.status(200).json({ artist: req.artist });
 });
 
-artistApi.post('/', (req, res, next) => {
+artistRouter.post('/', (req, res, next) => {
     const name = req.body.artist.name;
     const dateOfBirth = req.body.artist.dateOfBirth;
     const biography = req.body.artist.biography;
@@ -77,7 +77,7 @@ artistApi.post('/', (req, res, next) => {
     );
 });
 
-artistApi.put('/:artistId', (req, res, next) => {
+artistRouter.put('/:artistId', (req, res, next) => {
     const name = req.body.artist.name;
     const dateOfBirth = req.body.artist.dateOfBirth;
     const biography = req.body.artist.biography;
@@ -116,7 +116,7 @@ artistApi.put('/:artistId', (req, res, next) => {
     );
 });
 
-artistApi.delete('/:artistId', (req, res, next) => {
+artistRouter.delete('/:artistId', (req, res, next) => {
     db.run(
         'UPDATE Artist SET is_currently_employed = 0 WHERE Artist.id = $artistId',
         {
@@ -141,4 +141,4 @@ artistApi.delete('/:artistId', (req, res, next) => {
     );
 });
 
-module.exports = artistApi; 
+module.exports = artistRouter; 
