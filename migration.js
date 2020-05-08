@@ -1,7 +1,16 @@
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database('./database.sqlite');
+const db = new sqlite3.Database('database.sqlite');
 
 db.serialize(() => {
+    db.run(
+        'DROP TABLE IF EXISTS `Artist`', 
+        (err) => {
+            if(err) {
+                throw err; 
+            };
+        }
+    );
+
     db.run(
         'CREATE TABLE IF NOT EXISTS `Artist` ( ' +
             '`id` INTEGER NOT NULL, ' +
@@ -18,6 +27,16 @@ db.serialize(() => {
     );
 
     db.run(
+        'DROP TABLE IF EXISTS `Series`', 
+        (err) => {
+            if(err) {
+                throw err; 
+            };
+        }
+    );
+
+
+    db.run(
         'CREATE TABLE IF NOT EXISTS `Series` (' +
             '`id` INTEGER NOT NULL, ' +
             '`name` TEXT NOT NULL, ' + 
@@ -26,6 +45,33 @@ db.serialize(() => {
         (err) => {
             if(err) {
                 throw err; 
+            };
+        }
+    );
+
+    db.run(
+        'DROP TABLE IF EXISTS `Issue`', 
+        (err) => {
+            if(err) {
+                throw err; 
+            };
+        }
+    );
+
+    db.run(
+        'CREATE TABLE IF NOT EXISTS `Issue` ( ' +
+           '`id` INTEGER NOT NULL, ' +
+           '`name` TEXT NOT NULL, ' +
+           '`issue_number` INTEGER NOT NULL, ' +
+           '`publication_date` TEXT NOT NULL, ' +
+           '`artist_id` INTEGER NOT NULL, ' +
+           '`series_id` INTEGER NOT NULL, ' +
+           'PRIMARY KEY(`id`), ' +
+           'FOREIGN KEY(`artist_id`) REFERENCES `Artist`(`id`), ' +
+           'FOREIGN KEY(`series_id`) REFERENCES `Series`(`id`) )', 
+        (err) => {
+            if(err) {
+                throw err;
             };
         }
     );
